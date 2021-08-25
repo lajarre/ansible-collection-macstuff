@@ -1,14 +1,14 @@
 # Refers to homebrew.py plugin in ansible community.general and to homebrew-bundle README
 ---
-- name: "Extract brew name"
+- name: "Extract brew name..."
   set_fact:
-    brew_name: "{{ item | regex_replace('^brew \"(.*)\"', '\\1') }}"
+    brew_name: "{{ item | regex_replace('^brew \"(.+)\".*$', '\\1') }}"
   changed_when: false
 # - name: "Check if brew {{ brew_name }} is installed"
 #   shell: "{{ homebrew_brew_bin_path | quote }}/brew info {{ brew_name | quote }} | grep -e 'Poured from bottle' -e 'Built from source'"
 #   register: brew_is_installed
 #   failed_when: brew_is_installed.rc == 2
 #   changed_when: false
-- name: "Install brew {{ brew_name }}"
+- name: "... install brew {{ brew_name }}"
   when: "brew_name not in homebrew_installed_brews.stdout_lines"
   shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"

@@ -1,15 +1,15 @@
 # Refers to homebrew_cask.py plugin in ansible community.general and to homebrew-bundle README
 ---
-- name: "Extract cask name"
+- name: "Extract cask name..."
   set_fact:
-    cask_name: "{{ item | regex_replace('^cask \"(.*)\"', '\\1') }}"
+    cask_name: "{{ item | regex_replace('^cask \"(.+)\".*$', '\\1') }}"
   changed_when: false
 # - name: "Check if cask {{ cask_name }} is installed"
 #   command: "{{ homebrew_brew_bin_path }}/brew list --cask {{ cask_name }}"
 #   register: cask_is_installed
 #   failed_when: false
 #   changed_when: false
-- name: "Install cask {{ cask_name }}"
+- name: "... install cask {{ cask_name }}"
   when: "cask_name not in homebrew_installed_casks.stdout_lines"
   shell: |
     {{ homebrew_brew_bin_path | quote }}/brew bundle --file=- << EOF
