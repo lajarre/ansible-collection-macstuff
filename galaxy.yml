@@ -21,8 +21,7 @@ tags:
 
 dependencies:
   community.general: ">=3.0.0"
-  geerlingguy.mac.homebrew: ">=1.3.2"
-  geerlingguy.mac.mas: ">=1.3.2"
+  geerlingguy.mac: ">=1.3.2"
 
 repository: https://github.com/lajarre/ansible-collection-macstuff
 documentation: https://github.com/lajarre/ansible-collection-macstuff

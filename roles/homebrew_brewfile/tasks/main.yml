@@ -23,7 +23,7 @@
       register: homebrew_installed_brews
 
     - name: Extract brews from Brewfile
-      shell: "grep '^brew ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      command: "grep '^brew ' {{ homebrew_brewfile_dir }}/Brewfile"
       register: homebrew_brewfile_brew_entries
 
     - name: Install Brewfile brews one by one
@@ -40,7 +40,7 @@
       register: homebrew_installed_casks
 
     - name: Extract casks from Brewfile
-      shell: "grep '^cask ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      command: "grep '^cask ' {{ homebrew_brewfile_dir }}/Brewfile"
       register: homebrew_brewfile_cask_entries
 
     - name: Install Brewfile casks one by one
@@ -49,7 +49,7 @@
 
     # Here no need to go through the brew bundle command as mas entries do not have any option.
     - name: Extract mas ids from Brewfile
-      shell: "grep '^mas ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      command: "grep '^mas ' {{ homebrew_brewfile_dir }}/Brewfile"
       register: homebrew_brewfile_mas_entries
 
     - name: Install Brewfile mases one by one
