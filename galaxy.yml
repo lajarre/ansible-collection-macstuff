@@ -7,7 +7,7 @@ readme: README.md
 authors:
   - lajarre
 
-description: Some helper roles for mac os automation. Add-ons to [geerlingguy mac-dev-playbook](https://github.com/geerlingguy/mac-dev-playbook).
+description: Some helper roles for mac os automation. Add-ons to geerlingguy mac-dev-playbook.
 
 license:
   - MIT
