@@ -13,7 +13,7 @@
     - name: Extract taps from Brewfile
       command: "grep '^tap ' {{ homebrew_brewfile_dir }}/Brewfile"
       register: homebrew_brewfile_tap_entries
-    
+
     - name: Install Brewfile taps one by one
       loop: "{{ homebrew_brewfile_tap_entries.stdout_lines }}"
       include_tasks: tap_loop.yml
@@ -21,16 +21,16 @@
     - name: List installed brews
       command: "{{ homebrew_brew_bin_path }}/brew list --formula -1"
       register: homebrew_installed_brews
-    
+
     - name: Extract brews from Brewfile
       shell: "grep '^brew ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
       register: homebrew_brewfile_brew_entries
-    
+
     - name: Install Brewfile brews one by one
       loop: "{{ homebrew_brewfile_brew_entries.stdout_lines }}"
       include_tasks: brew_loop.yml
-    
-    - name: Extract global cask args 
+
+    - name: Extract global cask args
       command: "grep '^cask_args ' {{ homebrew_brewfile_dir }}/Brewfile"
       failed_when: false
       register: homebrew_brewfile_cask_args
@@ -38,11 +38,11 @@
     - name: List installed casks
       command: "{{ homebrew_brew_bin_path }}/brew list --cask -1"
       register: homebrew_installed_casks
-    
+
     - name: Extract casks from Brewfile
       shell: "grep '^cask ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
       register: homebrew_brewfile_cask_entries
-    
+
     - name: Install Brewfile casks one by one
       loop: "{{ homebrew_brewfile_cask_entries.stdout_lines }}"
       include_tasks: cask_loop.yml
