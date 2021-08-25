@@ -9,5 +9,5 @@ homebrew_taps:
   - homebrew/core
   - homebrew/bundle
 
-homebrew_use_brewfile: true
+homebrew_use_splitted_brewfile: true
 homebrew_brewfile_dir: '~'

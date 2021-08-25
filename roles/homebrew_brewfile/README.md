@@ -20,9 +20,9 @@ The path where `brew` will be installed.
 
 Set this to your account password if casks you want installed need elevated privileges while installing (like `microsoft-office`), preferably [encrypted via `ansible-vault`][link-vault-doc].
 
-    homebrew_use_brewfile: true
+    homebrew_use_splitted_brewfile: true
 
-Whether to install via a Brewfile. If so, you will need to install the `homebrew/bundle` tap, which could be done within `homebrew_taps`.
+Whether to do the install. If so, you will need to install the `homebrew/bundle` tap, which could be done within `homebrew_taps`.
 
     homebrew_brewfile_dir: '~'
 
