@@ -1,0 +1,13 @@
+---
+homebrew_repo: https://github.com/Homebrew/brew
+
+homebrew_prefix: "{{ (ansible_machine == 'arm64') | ternary('/opt/homebrew', '/usr/local') }}"
+homebrew_install_path: "{{ homebrew_prefix }}/Homebrew"
+homebrew_brew_bin_path: "{{ homebrew_prefix }}/bin"
+
+homebrew_taps:
+  - homebrew/core
+  - homebrew/bundle
+
+homebrew_use_brewfile: true
+homebrew_brewfile_dir: '~'

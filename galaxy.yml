@@ -1,0 +1,31 @@
+---
+namespace: lajarre
+name: macstuff
+version: "1.0.0"
+readme: README.md
+
+authors:
+  - lajarre
+
+description: Some helper roles for mac os automation. Add-ons to [geerlingguy mac-dev-playbook](https://github.com/geerlingguy/mac-dev-playbook).
+
+license:
+  - MIT
+
+tags:
+  - mac
+  - macos
+  - osx
+  - homebrew
+  - brew
+
+dependencies:
+  community.general: ">=3.0.0"
+  geerlingguy.mac.homebrew: ">=1.3.2"
+  geerlingguy.mac.mas: ">=1.3.2"
+
+repository: https://github.com/lajarre/ansible-collection-macstuff
+documentation: https://github.com/lajarre/ansible-collection-macstuff
+issues: https://github.com/lajarre/ansible-collection-macstuff/issues
+
+build_ignore: []

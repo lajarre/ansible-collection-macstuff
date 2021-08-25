@@ -1,0 +1,9 @@
+# Refers to homebrew_tap.py plugin in ansible community.general and to homebrew-bundle README
+---
+- name: "Extract tap name"
+  set_fact:
+    tap_name: "{{ item | regex_replace('^tap \"(.*)\"', '\\1') }}"
+  changed_when: false
+- name: "Install tap {{ tap_name }}"
+  when: "tap_name not in homebrew_installed_taps.stdout_lines"
+  shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"

@@ -1,0 +1,66 @@
+---
+# - name: Determine Homebrew ownership variables
+#   set_fact:
+#     homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+#     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+
+- name: Install from Brewfile bit by bit
+  block:
+    - name: List installed taps
+      command: "{{ homebrew_brew_bin_path }}/brew tap"
+      register: homebrew_installed_taps
+
+    - name: Extract taps from Brewfile
+      command: "grep '^tap ' {{ homebrew_brewfile_dir }}/Brewfile"
+      register: homebrew_brewfile_tap_entries
+    
+    - name: Install Brewfile taps one by one
+      loop: "{{ homebrew_brewfile_tap_entries.stdout_lines }}"
+      include_tasks: tap_loop.yml
+
+    - name: List installed brews
+      command: "{{ homebrew_brew_bin_path }}/brew list --formula -1"
+      register: homebrew_installed_brews
+    
+    - name: Extract brews from Brewfile
+      shell: "grep '^brew ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      register: homebrew_brewfile_brew_entries
+    
+    - name: Install Brewfile brews one by one
+      loop: "{{ homebrew_brewfile_brew_entries.stdout_lines }}"
+      include_tasks: brew_loop.yml
+    
+    - name: Extract global cask args 
+      command: "grep '^cask_args ' {{ homebrew_brewfile_dir }}/Brewfile"
+      failed_when: false
+      register: homebrew_brewfile_cask_args
+
+    - name: List installed casks
+      command: "{{ homebrew_brew_bin_path }}/brew list --cask -1"
+      register: homebrew_installed_casks
+    
+    - name: Extract casks from Brewfile
+      shell: "grep '^cask ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      register: homebrew_brewfile_cask_entries
+    
+    - name: Install Brewfile casks one by one
+      loop: "{{ homebrew_brewfile_cask_entries.stdout_lines }}"
+      include_tasks: cask_loop.yml
+
+    # Here no need to go through the brew bundle command as mas entries do not have any option.
+    - name: Extract mas ids from Brewfile
+      shell: "grep '^mas ' {{ homebrew_brewfile_dir | quote }}/Brewfile"
+      register: homebrew_brewfile_mas_entries
+
+    - name: Install Brewfile mases one by one
+      loop: "{{ homebrew_brewfile_mas_entries.stdout_lines }}"
+      mas:
+        id: "{{ item | regex_replace('^mas \".*\", id: (\\d+)$', '\\1') }}"
+        state: present
+
+  ignore_errors: true
+  when: homebrew_brewfile.stat.exists and homebrew_use_brewfile
+  # Privilege escalation is only required for inner steps when
+  # the `homebrew_user` doesn't match the `ansible_user_id`
+  become: "{{ (homebrew_user != ansible_user_id) | bool }}"
+  become_user: "{{ homebrew_user }}"
