@@ -1,8 +1,9 @@
 # See homebrew.py plugin in ansible community.general and to homebrew-bundle README
 ---
-- set_fact:
+- name: "Extract brew name..."
+  set_fact:
     brew_name: "{{ item | regex_replace('^brew \"(.+)\".*$', '\\1') }}"
   changed_when: false
-- name: "Install brew {{ brew_name }}"
+- name: ".. install brew {{ brew_name }}"
   when: "brew_name not in homebrew_installed_brews.stdout_lines"
   shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"
