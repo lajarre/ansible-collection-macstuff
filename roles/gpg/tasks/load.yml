@@ -1,0 +1,17 @@
+---
+- name: Determine Homebrew ownership variables
+  set_fact:
+    homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+    homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+- name: Determine dump file
+  set_fact:
+    gpg_pub_dump_file: "{{ playbook_dir }}/files/gpg/pubkeys.gpg"
+    gpg_priv_dump_file: "{{ playbook_dir }}/files/gpg/privkeys.gpg"
+
+- name: Import pub keys
+  command: "gpg --import {{ gpg_pub_dump_file }}"
+  changed_when: true
+
+- name: Import priv keys
+  command: "gpg --import {{ gpg_pub_dump_file }}"
+  changed_when: true
