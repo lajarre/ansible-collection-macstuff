@@ -1,0 +1,68 @@
+---
+- name: Determine Homebrew ownership variables
+  set_fact:
+    homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+    homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+- name: Determine library dump folders
+  set_fact:
+    library_dest_folder: "{{ library_dest_folder | default(ansible_env.HOME + '/Library') }}"
+    library_plists_dest_folder: "{{ library_plists_dest_folder | default(ansible_env.HOME + '/Library/Preferences') }}"
+    library_appsupport_dest_folder: "{{ library_appsupport_dest_folder | default(ansible_env.HOME + '/Library/Application Support') }}"
+    library_plists_dump_folder: "{{ playbook_dir }}/files/plists"
+    library_zip_dump_folder: "{{ playbook_dir }}/files/Library"
+    library_appsupport_zip_dump_folder: "{{ playbook_dir }}/files/Application Support"
+
+- name: "Plists"
+  block:
+    - name: List dumped plists
+      find:
+        paths: "{{ library_plists_dump_folder }}"
+        recurse: "yes"
+        file_type: file
+      delegate_to: 127.0.0.1
+      register: plists
+    - name: "Copy {{ item.path | basename }} into place"
+      loop: "{{ plists.files }}"
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ library_plists_dest_folder }}/{{ item.path | trim_folder_path(library_plists_dump_folder + '/') }}"
+        owner: "{{ homebrew_user }}"
+        group: "{{ homebrew_group }}"
+        mode: '0600'
+        directory_mode: '0700'
+        force: "no"
+  when: library_load_plists
+
+- name: "Library files"
+  block:
+    - name: List Library zips
+      find:
+        paths: "{{ library_zip_dump_folder }}"
+        file_type: file
+      delegate_to: 127.0.0.1
+      register: lib_zip
+    - name: Unzip Library zips into place
+      loop: "{{ lib_zip.files }}"
+      unarchive:
+        src: "{{ item.path }}"
+        dest: "{{ library_dest_folder }}"
+        owner: "{{ homebrew_user }}"
+        group: "{{ homebrew_group }}"
+  when: library_load_files
+
+- name: Application Support files
+  block:
+    - name: List Application Support zips
+      find:
+        paths: "{{ library_appsupport_zip_dump_folder }}"
+        file_type: file
+      delegate_to: 127.0.0.1
+      register: appsupport_zip
+    - name: Unzip Application Support zips into place
+      loop: "{{ appsupport_zip.files }}"
+      unarchive:
+        src: "{{ item.path }}"
+        dest: "{{ library_appsupport_dest_folder }}"
+        owner: "{{ homebrew_user }}"
+        group: "{{ homebrew_group }}"
+  when: library_load_appsupport_files
