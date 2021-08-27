@@ -21,7 +21,7 @@
         file_type: file
       delegate_to: 127.0.0.1
       register: plists
-    - name: "Copy {{ item.path | basename }} into place"
+    - name: "Copy plists into place"
       loop: "{{ plists.files }}"
       copy:
         src: "{{ item.path }}"
