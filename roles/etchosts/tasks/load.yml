@@ -1,0 +1,26 @@
+---
+- name: Determine Homebrew ownership variables
+  set_fact:
+    homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+    homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+- name: Determine dump file
+  set_fact:
+    etchosts_dump_file: "{{ playbook_dir }}/files/hosts"
+
+- name: Read /etc/hosts
+  slurp:
+    src: "/etc/hosts"
+  register: etchosts
+- name: Backup /etc/hosts to file
+  copy:
+    content: "{{ etchosts.content }}"
+    dest: "etchosts.bak"
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    mode: '0600'
+    force: "yes"
+- name: Load /etc/hosts
+  copy:
+    src: "{{ etchosts_dump_file }}"
+    dest: "/etc/hosts"
+  become: true

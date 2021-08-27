@@ -1,0 +1,7 @@
+---
+- name: Load /etc/hosts
+  include_tasks: load.yml
+  when: etchosts_mode == 'load'
+- name: Dump /etc/hosts
+  include_tasks: dump.yml
+  when: etchosts_mode == 'dump'
