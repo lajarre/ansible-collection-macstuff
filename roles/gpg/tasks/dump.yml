@@ -28,7 +28,7 @@
 - name: Write priv keys file
   copy:
     content: "{{ gpg_priv.stdout }}"
-    dest: "{{ gpg_pub_dump_file }}"
+    dest: "{{ gpg_priv_dump_file }}"
     owner: "{{ homebrew_user }}"
     group: "{{ homebrew_group }}"
     mode: '0600'
