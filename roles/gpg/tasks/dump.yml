@@ -16,6 +16,7 @@
   command: "gpg --export-secret-keys --armor"
   changed_when: true
   register: gpg_priv
+  failed_when: false
 - name: Write pub keys file
   copy:
     content: "{{ gpg_pub.stdout }}"
