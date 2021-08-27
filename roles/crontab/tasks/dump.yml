@@ -13,7 +13,7 @@
   register: crontab
 - name: Write crontab to file
   copy:
-    content: "{{ crontab }}"
+    content: "{{ crontab.stdout }}"
     dest: "{{ crontab_dump_file }}"
     owner: "{{ homebrew_user }}"
     group: "{{ homebrew_group }}"
