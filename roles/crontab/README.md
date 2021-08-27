@@ -14,7 +14,7 @@ None.
 
     - hosts: localhost
       vars:
-        mode: load
+        crontab_mode: load
       roles:
         - lajarre.macstuff.crontab
 

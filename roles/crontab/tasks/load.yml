@@ -5,8 +5,20 @@
     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
 - name: Determine dump file
   set_fact:
-    crontab_dump_file: "{{ playbook_dir }}/files/crontab.bak"
+    crontab_dump_file: "{{ playbook_dir }}/files/crontab"
 
+- name: Read crontab
+  command: "crontab -l"
+  changed_when: true
+  register: crontab
+- name: Backup crontab to file
+  copy:
+    content: "{{ crontab.stdout }}"
+    dest: "crontab.bak"
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    mode: '0600'
+    force: "yes"
 - name: Load crontab
   command: "crontab {{ crontab_dump_file }}"
   changed_when: true
