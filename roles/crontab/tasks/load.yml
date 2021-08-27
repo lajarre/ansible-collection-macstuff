@@ -9,3 +9,4 @@
 
 - name: Load crontab
   command: "crontab {{ crontab_dump_file }}"
+  changed_when: true

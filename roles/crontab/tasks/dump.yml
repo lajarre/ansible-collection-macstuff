@@ -9,6 +9,7 @@
 
 - name: Read crontab
   command: "crontab -l"
+  changed_when: true
   register: crontab
 - name: Write crontab to file
   copy:
