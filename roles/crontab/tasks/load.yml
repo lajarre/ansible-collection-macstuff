@@ -14,7 +14,7 @@
 - name: Backup crontab to file
   copy:
     content: "{{ crontab.stdout }}"
-    dest: "crontab.bak"
+    dest: "crontab.{{ ansible_date_time.iso8601_basic_short }}.bak"
     owner: "{{ homebrew_user }}"
     group: "{{ homebrew_group }}"
     mode: '0600'

@@ -14,7 +14,7 @@
 - name: Backup /etc/hosts to file
   copy:
     content: "{{ etchosts.content }}"
-    dest: "etchosts.bak"
+    dest: "etchosts.{{ ansible_date_time.iso8601_basic_short }}.bak"
     owner: "{{ homebrew_user }}"
     group: "{{ homebrew_group }}"
     mode: '0600'
