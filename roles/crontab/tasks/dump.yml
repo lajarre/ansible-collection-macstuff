@@ -1,0 +1,20 @@
+---
+- name: Determine Homebrew ownership variables
+  set_fact:
+    homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+    homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+- name: Determine dump file
+  set_fact:
+    crontab_dump_file: "{{ playbook_dir }}/files/crontab.bak"
+
+- name: Read crontab
+  command: "crontab -l"
+  register: crontab
+- name: Write crontab to file
+  copy:
+    content: "{{ crontab }}"
+    dest: "{{ crontab_dump_file }}"
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    mode: '0600'
+    force: "yes"

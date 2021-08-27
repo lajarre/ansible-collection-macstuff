@@ -23,9 +23,9 @@ None.
 
     - hosts: localhost
       vars:
-        mode: load
+        library_mode: load
       roles:
-        - lajarre.mac.library
+        - lajarre.macstuff.library
 
 ## License
 

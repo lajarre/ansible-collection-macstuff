@@ -1,0 +1,11 @@
+---
+- name: Determine Homebrew ownership variables
+  set_fact:
+    homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
+    homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
+- name: Determine dump file
+  set_fact:
+    crontab_dump_file: "{{ playbook_dir }}/files/crontab.bak"
+
+- name: Load crontab
+  command: "crontab {{ crontab_dump_file }}"

@@ -1,0 +1,7 @@
+---
+- name: Load crontab
+  include_tasks: load.yml
+  when: crontab_mode == 'load'
+- name: Dump crontab
+  include_tasks: dump.yml
+  when: crontab_mode == 'dump'
