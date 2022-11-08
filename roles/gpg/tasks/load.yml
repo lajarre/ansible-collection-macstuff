@@ -15,3 +15,4 @@
 - name: Import priv keys
   ansible.builtin.command: "gpg --import {{ gpg_priv_dump_file }}"
   changed_when: true
+  failed_when: false
