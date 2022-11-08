@@ -1,7 +1,7 @@
 ---
 - name: Load library files
-  include_tasks: load.yml
   when: library_mode == 'load'
+  ansible.builtin.include_tasks: load.yml
 - name: Dump library files
-  include_tasks: dump.yml
   when: library_mode == 'dump'
+  ansible.builtin.include_tasks: dump.yml

@@ -1,24 +1,24 @@
 ---
 - name: Determine Homebrew ownership variables
-  set_fact:
+  ansible.builtin.set_fact:
     homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
 - name: Determine dump file
-  set_fact:
+  ansible.builtin.set_fact:
     gpg_pub_dump_file: "{{ playbook_dir }}/files/gpg/pubkeys.gpg"
     gpg_priv_dump_file: "{{ playbook_dir }}/files/gpg/privkeys.gpg"
 
 - name: Get pub keys
-  command: "gpg --export --armor"
+  ansible.builtin.command: "gpg --export --armor"
   changed_when: true
   register: gpg_pub
 - name: Get priv keys
-  command: "gpg --export-secret-keys --armor"
+  ansible.builtin.command: "gpg --export-secret-keys --armor"
   changed_when: true
   register: gpg_priv
   failed_when: false
 - name: Write pub keys file
-  copy:
+  ansible.builtin.copy:
     content: "{{ gpg_pub.stdout }}"
     dest: "{{ gpg_pub_dump_file }}"
     owner: "{{ homebrew_user }}"
@@ -26,7 +26,7 @@
     mode: '0600'
     force: "yes"
 - name: Write priv keys file
-  copy:
+  ansible.builtin.copy:
     content: "{{ gpg_priv.stdout }}"
     dest: "{{ gpg_priv_dump_file }}"
     owner: "{{ homebrew_user }}"

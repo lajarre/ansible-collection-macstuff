@@ -1,10 +1,10 @@
 ---
 - name: Determine Homebrew ownership variables
-  set_fact:
+  ansible.legacy.set_fact:
     homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
 - name: Determine library dump folders
-  set_fact:
+  ansible.legacy.set_fact:
     library_src_folder: "{{ library_src_folder | default(ansible_env.HOME + '/Library') }}"
     library_plists_src_folder: "{{ library_plists_src_folder | default(ansible_env.HOME + '/Library/Preferences') }}"
     library_appsupport_src_folder: "{{ library_appsupport_src_folder | default(ansible_env.HOME + '/Library/Application Support') }}"
@@ -15,15 +15,16 @@
     library_all_appsupport_files_file: "{{ playbook_dir }}/files/all_appsupport_files"
     library_appsupport_zip_dump_folder: "{{ playbook_dir }}/files/Application Support"
 - name: Determine new dumps to be done
-  set_fact:
+  ansible.legacy.set_fact:
     library_plists_new: "{{ library_plists_new | default([]) }}"
     library_files_new: "{{ library_files_new | default([]) }}"
     library_appsupport_new: "{{ library_appsupport_new | default([]) }}"
 
 - name: Plists
+  when: library_dump_plists
   block:
     - name: Find all plists at source
-      find:
+      ansible.builtin.find:
         paths: "{{ library_plists_src_folder }}"
         recurse: "yes"
         file_type: file
@@ -31,7 +32,7 @@
         use_regex: "yes"
       register: library_src_plists
     - name: Write listing of all plists
-      copy:
+      ansible.builtin.copy:
         content: "{{ library_src_plists.files | trim_folder_path(library_plists_src_folder + '/') | join('\n') }}"
         dest: "{{ library_all_plists_file }}"
         owner: "{{ homebrew_user }}"
@@ -40,7 +41,7 @@
         force: "yes"
 
     - name: List existing plists
-      find:
+      ansible.builtin.find:
         paths: "{{ library_plists_dump_folder }}"
         recurse: "yes"
         file_type: file
@@ -49,7 +50,7 @@
       register: library_dumped_plists
     - name: Re-dump plists
       loop: "{{ library_dumped_plists.files }}"
-      copy:
+      ansible.builtin.copy:
         src: "{{ library_plists_src_folder }}/{{ item.path | trim_folder_path(library_plists_dump_folder + '/') }}"
         dest: "{{ item.path }}"
         owner: "{{ homebrew_user }}"
@@ -58,7 +59,7 @@
         force: "yes"
     - name: Dump new plists
       loop: "{{ library_plists_new }}"
-      copy:
+      ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ library_plists_dump_folder }}/{{ item | expanduser | trim_folder_path(library_plists_src_folder + '/') }}"
         owner: "{{ homebrew_user }}"
@@ -66,18 +67,18 @@
         mode: '0600'
         force: "yes"
 
-  when: library_dump_plists
 
 - name: Library files
+  when: library_dump_files
   block:
     - name: Find all Library files at source
-      find:
+      ansible.builtin.find:
         paths: "{{ library_src_folder }}"
         recurse: "no"
         file_type: directory
       register: library_src_files
     - name: Write listing of all Library files
-      copy:
+      ansible.builtin.copy:
         content: "{{ library_src_files.files | trim_folder_path(library_src_folder + '/') | join('\n') }}"
         dest: "{{ library_all_files_file }}"
         owner: "{{ homebrew_user }}"
@@ -86,35 +87,35 @@
         force: "yes"
 
     - name: List existing Library dumps
-      find:
+      ansible.builtin.find:
         paths: "{{ library_zip_dump_folder }}"
         file_type: file
       register: library_dumped_libs
     - name: Re-dump Library files
       loop: "{{ library_dumped_libs.files }}"
-      archive:
+      community.general.archive:
         path: "{{ library_src_folder }}/{{ item.path | trim_folder_path(library_zip_dump_folder + '/') | splitext | first | splitext | first }}"
         dest: "{{ item.path }}"
         force_archive: "yes"
     - name: Dump new Library files
       loop: "{{ library_files_new }}"
-      archive:
+      community.general.archive:
         path: "{{ item }}"
         dest: "{{ library_zip_dump_folder }}/{{ item | expanduser | trim_folder_path(library_src_folder + '/') }}.zip"
         force_archive: "yes"
 
-  when: library_dump_files
 
 - name: Application Support files
+  when: library_dump_appsupport_files
   block:
     - name: Find all Application Support files at source
-      find:
+      ansible.builtin.find:
         paths: "{{ library_appsupport_src_folder }}"
         recurse: "no"
         file_type: directory
       register: library_src_appsupport_files
     - name: Write listing of all Application Support files
-      copy:
+      ansible.builtin.copy:
         content: "{{ library_src_appsupport_files.files | trim_folder_path(library_appsupport_src_folder + '/') | join('\n') }}"
         dest: "{{ library_all_appsupport_files_file }}"
         owner: "{{ homebrew_user }}"
@@ -123,21 +124,19 @@
         force: "yes"
 
     - name: List existing Application Support dumps
-      find:
+      ansible.builtin.find:
         paths: "{{ library_appsupport_zip_dump_folder }}"
         file_type: file
       register: library_dumped_appsupport
     - name: Re-dump Application Support files
       loop: "{{ library_dumped_appsupport.files }}"
-      archive:
+      community.general.archive:
         path: "{{ library_appsupport_src_folder }}/{{ item.path | trim_folder_path(library_appsupport_zip_dump_folder + '/') | splitext | first | splitext | first }}"
         dest: "{{ item.path }}"
         force_archive: "yes"
     - name: Dump new Application Support files
       loop: "{{ library_appsupport_new }}"
-      archive:
+      community.general.archive:
         path: "{{ item }}"
         dest: "{{ library_appsupport_zip_dump_folder }}/{{ item | expanduser | trim_folder_path(library_appsupport_src_folder + '/') }}.zip"
         force_archive: "yes"
-
-  when: library_dump_appsupport_files

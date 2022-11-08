@@ -1,18 +1,18 @@
 ---
 - name: Determine Homebrew ownership variables
-  set_fact:
+  ansible.builtin.set_fact:
     homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
 - name: Determine dump file
-  set_fact:
+  ansible.builtin.set_fact:
     crontab_dump_file: "{{ playbook_dir }}/files/crontab"
 
 - name: Read crontab
-  command: "crontab -l"
+  ansible.builtin.command: "crontab -l"
   changed_when: true
   register: crontab
 - name: Write crontab to file
-  copy:
+  ansible.builtin.copy:
     content: "{{ crontab.stdout }}"
     dest: "{{ crontab_dump_file }}"
     owner: "{{ homebrew_user }}"

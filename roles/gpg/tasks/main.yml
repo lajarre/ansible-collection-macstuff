@@ -1,7 +1,7 @@
 ---
 - name: Load gpg key ring
-  include_tasks: load.yml
   when: gpg_mode == 'load'
+  ansible.builtin.include_tasks: load.yml
 - name: Dump gpg key ring
-  include_tasks: dump.yml
   when: gpg_mode == 'dump'
+  ansible.builtin.include_tasks: dump.yml

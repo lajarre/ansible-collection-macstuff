@@ -1,47 +1,49 @@
 ---
 - name: Determine Homebrew ownership variables
-  set_fact:
+  ansible.builtin.set_fact:
     homebrew_user: '{{ homebrew_user | default(ansible_user_id) }}'
     homebrew_group: '{{ homebrew_group | default(ansible_user_gid) }}'
 
 - name: Install from Brewfile bit by bit
-  block:
-    - name: List installed taps
-      command: "{{ homebrew_brew_bin_path }}/brew tap"
-      register: homebrew_installed_taps
-    - name: List installed brews
-      command: "{{ homebrew_brew_bin_path }}/brew list --formula -1"
-      register: homebrew_installed_brews
-    - name: List installed casks
-      command: "{{ homebrew_brew_bin_path }}/brew list --cask -1"
-      register: homebrew_installed_casks
-
-    - name: Install Brewfile taps one by one
-      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^tap .*$', multiline=True) }}"
-      include_tasks: tap_loop.yml
-
-    - name: Install Brewfile brews one by one
-      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^brew .*$', multiline=True) }}"
-      include_tasks: brew_loop.yml
-
-    - name: Extract global cask args
-      set_fact:
-        homebrew_brewfile_cask_args: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_search('^cask_args .*$', multiline=True) }}"
-
-    - name: Install Brewfile casks one by one
-      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^cask .*$', multiline=True) }}"
-      include_tasks: cask_loop.yml
-
-    # Here no need to go through the brew bundle command as mas entries do not have any option.
-    - name: Install Brewfile mases one by one
-      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^mas .*$', multiline=True) }}"
-      mas:
-        id: "{{ item | regex_replace('^mas \".*\", id: (\\d+)$', '\\1') }}"
-        state: present
-
-  ignore_errors: true
   when: homebrew_use_splitted_brewfile
+  failed_when: false
   # Privilege escalation is only required for inner steps when
   # the `homebrew_user` doesn't match the `ansible_user_id`
   become: "{{ (homebrew_user != ansible_user_id) | bool }}"
   become_user: "{{ homebrew_user }}"
+  block:
+    - name: List installed taps
+      ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew tap"
+      register: homebrew_installed_taps
+      changed_when: true
+    - name: List installed brews
+      ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew list --formula -1"
+      register: homebrew_installed_brews
+      changed_when: true
+    - name: List installed casks
+      ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew list --cask -1"
+      register: homebrew_installed_casks
+      changed_when: true
+
+    - name: Install Brewfile taps one by one
+      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^tap .*$', multiline=True) }}"
+      ansible.builtin.include_tasks: tap_loop.yml
+
+    - name: Install Brewfile brews one by one
+      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^brew .*$', multiline=True) }}"
+      ansible.builtin.include_tasks: brew_loop.yml
+
+    - name: Extract global cask args
+      ansible.builtin.set_fact:
+        homebrew_brewfile_cask_args: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_search('^cask_args .*$', multiline=True) }}"
+
+    - name: Install Brewfile casks one by one
+      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^cask .*$', multiline=True) }}"
+      ansible.builtin.include_tasks: cask_loop.yml
+
+    # Here no need to go through the brew bundle command as mas entries do not have any option.
+    - name: Install Brewfile mases one by one
+      loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^mas .*$', multiline=True) }}"
+      community.general.mas:
+        id: "{{ item | regex_replace('^mas \".*\", id: (\\d+)$', '\\1') }}"
+        state: present
