@@ -14,15 +14,15 @@
     - name: List installed taps
       ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew tap"
       register: homebrew_installed_taps
-      changed_when: true
+      changed_when: homebrew_installed_taps.rc == 0
     - name: List installed brews
       ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew list --formula -1"
       register: homebrew_installed_brews
-      changed_when: true
+      changed_when: homebrew_installed_brews.rc == 0
     - name: List installed casks
       ansible.builtin.command: "{{ homebrew_brew_bin_path }}/brew list --cask -1"
       register: homebrew_installed_casks
-      changed_when: true
+      changed_when: homebrew_installed_casks.rc == 0
 
     - name: Install Brewfile taps one by one
       loop: "{{ lookup('file', homebrew_brewfile_dir + '/Brewfile') | regex_findall('^tap .*$', multiline=True) }}"

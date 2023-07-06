@@ -14,3 +14,5 @@
     {% endif -%}
     {{ item }}
     EOF
+  register: cask_install_result
+  changed_when: "cask_install_result.rc == 0"

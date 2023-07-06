@@ -7,3 +7,5 @@
 - name: "... install tap {{ tap_name }}"
   when: "tap_name not in homebrew_installed_taps.stdout_lines"
   ansible.builtin.shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"
+  register: tap_result
+  changed_when: tap_result.rc == 0
