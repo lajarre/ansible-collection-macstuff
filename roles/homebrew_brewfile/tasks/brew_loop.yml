@@ -6,4 +6,5 @@
   changed_when: false
 - name: ".. install brew {{ brew_name }}"
   when: "brew_name not in homebrew_installed_brews.stdout_lines"
-  ansible.builtin.shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"
+  failed_when: false
+  ansible.builtin.command: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"

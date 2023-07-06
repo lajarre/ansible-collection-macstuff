@@ -6,7 +6,6 @@
 
 - name: Install from Brewfile bit by bit
   when: homebrew_use_splitted_brewfile
-  failed_when: false
   # Privilege escalation is only required for inner steps when
   # the `homebrew_user` doesn't match the `ansible_user_id`
   become: "{{ (homebrew_user != ansible_user_id) | bool }}"
@@ -47,3 +46,4 @@
       community.general.mas:
         id: "{{ item | regex_replace('^mas \".*\", id: (\\d+)$', '\\1') }}"
         state: present
+      failed_when: false
