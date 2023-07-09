@@ -6,7 +6,7 @@
   changed_when: false
 - name: ".. install brew {{ brew_name }}"
   when: "brew_name not in homebrew_installed_brews.stdout_lines"
-  failed_when: false
-  ansible.builtin.command: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"
+  ansible.builtin.shell: "{{ homebrew_brew_bin_path | quote }}/brew bundle --file=- <<< {{ item | quote }}"
   register: install_result
   changed_when: "install_result.rc == 0"
+  failed_when: "install_result.rc > 0"
